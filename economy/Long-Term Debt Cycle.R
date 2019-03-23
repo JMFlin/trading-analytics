@@ -4,9 +4,6 @@ library(gridExtra)
 library(ggplot2)
 library(lubridate)
 Sys.setlocale("LC_TIME", "C")
-Quandl.api_key("Ykn-RwEHL2VBzptNdD6x")
-
-browseURL("https://www.nordnet.fi/webtrader/?locale=fi")
 
 browseURL("https://stockcharts.com/freecharts/candleglance.html?[US]")
 
