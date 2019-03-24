@@ -1,4 +1,4 @@
-library(quantmod)
+glibrary(quantmod)
 library(ggplot2)
 library(scales)
 library(reshape)
@@ -6,8 +6,12 @@ library(PerformanceAnalytics)
 library(lubridate)
 library(gridExtra)
 library(Quandl)
+library(yaml)
+
+keys <- read_yaml("C:/Users/janne/Documents/trading-analytics/API_keys.yaml")
+
 Sys.setlocale("LC_TIME", "C")
-Quandl.api_key("Ykn-RwEHL2VBzptNdD6x")
+Quandl.api_key(keys$Quandl)
 
 economic_momentum <- function(data, n_ema = 12, from = "2007-03-01"){
   #data <- data_xts_2
@@ -20,12 +24,12 @@ economic_momentum <- function(data, n_ema = 12, from = "2007-03-01"){
   a$name <- row.names(a)
   b <- a[a$a <= 1,"name"]
   data_xts <- data_xts[,names(data_xts) %in% b]
-  
+
   data_xts_clone <- data_xts
-  
+
   for(i in 1:ncol(data_xts)){
     for(j in 4:nrow(data_xts)){
-      
+
       if(!is.na(data_xts[j,i]) & !is.na(data_xts[nrow(data_xts),i])){
         if(data_xts[j,i] >= data_xts[j-3,i]){
           data_xts_clone[j,i] = 1
@@ -35,10 +39,10 @@ economic_momentum <- function(data, n_ema = 12, from = "2007-03-01"){
       }
     }
   }
-  
+
   for(i in 1:ncol(data_xts)){
     for(j in 4:(nrow(data_xts)-1)){
-      
+
       if(!is.na(data_xts[j,i]) & is.na(data_xts[nrow(data_xts),i])){
         if(data_xts[j,i] >= data_xts[j-3,i]){
           data_xts_clone[j,i] = 1
@@ -48,7 +52,7 @@ economic_momentum <- function(data, n_ema = 12, from = "2007-03-01"){
       }
     }
   }
-  
+
   #sum(colSums(is.na(data_xts_clone)) > 0)
   data_xts_clone$percent <- rowSums(data_xts_clone, na.rm = TRUE)/ncol(data_xts_clone)
   #data_xts_clone$percent[nrow(data_xts_clone)] <- rowSums(data_xts_clone[nrow(data_xts_clone),1:(ncol(data_xts_clone)-1)], na.rm = TRUE)/sum(colSums(is.na(data_xts_clone)) > 0)
@@ -56,7 +60,7 @@ economic_momentum <- function(data, n_ema = 12, from = "2007-03-01"){
   data_xts_clone <- data_xts_clone[4:nrow(data_xts_clone),]
   data_xts_clone$Date <- as.Date(row.names(data_xts_clone))
   data_xts_clone$ma <- EMA(data_xts_clone[,"percent"], n=n_ema)
-  
+
   a <- ggplot(data_xts_clone, aes(x=Date, y=percent))+
     geom_line()+
     geom_point(size = 1)+
@@ -68,20 +72,20 @@ economic_momentum <- function(data, n_ema = 12, from = "2007-03-01"){
     theme_bw()+
     ggtitle("")+
     scale_x_date(date_breaks = "2 year", date_labels = "%Y")+
-    theme(axis.line = element_line(), 
-          axis.text=element_text(color='black'), 
-          axis.title = element_text(colour = 'black'), 
-          legend.text=element_text(), 
+    theme(axis.line = element_line(),
+          axis.text=element_text(color='black'),
+          axis.title = element_text(colour = 'black'),
+          legend.text=element_text(),
           legend.title=element_text(),
           axis.text.x = element_text(angle = 0),
           legend.position='none',
           text = element_text(size=10))
-  
+
   data_xts_clone <- data_xts
-  
+
   for(i in 1:ncol(data_xts)){
     for(j in 7:nrow(data_xts)){
-      
+
       if(!is.na(data_xts[j,i]) & !is.na(data_xts[nrow(data_xts),i])){
         if(data_xts[j,i] >= data_xts[j-6,i]){
           data_xts_clone[j,i] = 1
@@ -91,10 +95,10 @@ economic_momentum <- function(data, n_ema = 12, from = "2007-03-01"){
       }
     }
   }
-  
+
   for(i in 1:ncol(data_xts)){
     for(j in 7:(nrow(data_xts)-1)){
-      
+
       if(!is.na(data_xts[j,i]) & is.na(data_xts[nrow(data_xts),i])){
         if(data_xts[j,i] >= data_xts[j-6,i]){
           data_xts_clone[j,i] = 1
@@ -104,14 +108,14 @@ economic_momentum <- function(data, n_ema = 12, from = "2007-03-01"){
       }
     }
   }
-  
+
   data_xts_clone$percent <- rowSums(data_xts_clone, na.rm = TRUE)/ncol(data_xts_clone)
   #data_xts_clone$percent[nrow(data_xts_clone)] <- rowSums(data_xts_clone[nrow(data_xts_clone),1:(ncol(data_xts_clone)-1)], na.rm = TRUE)/sum(colSums(is.na(data_xts_clone)) > 0)
   data_xts_clone$percent <- data_xts_clone$percent*100
   data_xts_clone <- data_xts_clone[7:nrow(data_xts_clone),]
   data_xts_clone$Date <- as.Date(row.names(data_xts_clone))
   data_xts_clone$ma <- EMA(data_xts_clone[,"percent"], n=n_ema)
-  
+
   b <- ggplot(data_xts_clone, aes(x=Date, y=percent))+
     geom_line()+
     geom_point(size = 1)+
@@ -123,20 +127,20 @@ economic_momentum <- function(data, n_ema = 12, from = "2007-03-01"){
     theme_bw()+
     ggtitle("")+
     scale_x_date(date_breaks = "2 year", date_labels = "%Y")+
-    theme(axis.line = element_line(), 
-          axis.text=element_text(color='black'), 
-          axis.title = element_text(colour = 'black'), 
-          legend.text=element_text(), 
+    theme(axis.line = element_line(),
+          axis.text=element_text(color='black'),
+          axis.title = element_text(colour = 'black'),
+          legend.text=element_text(),
           legend.title=element_text(),
           axis.text.x = element_text(angle = 0),
           legend.position='none',
           text = element_text(size=10))
-  
+
   data_xts_clone <- data_xts
-  
+
   for(i in 1:ncol(data_xts)){
     for(j in 13:nrow(data_xts)){
-      
+
       if(!is.na(data_xts[j,i]) & !is.na(data_xts[nrow(data_xts),i])){
         if(data_xts[j,i] >= data_xts[j-12,i]){
           data_xts_clone[j,i] = 1
@@ -146,10 +150,10 @@ economic_momentum <- function(data, n_ema = 12, from = "2007-03-01"){
       }
     }
   }
-  
+
   for(i in 1:ncol(data_xts)){
     for(j in 13:(nrow(data_xts)-1)){
-      
+
       if(!is.na(data_xts[j,i]) & is.na(data_xts[nrow(data_xts),i])){
         if(data_xts[j,i] >= data_xts[j-12,i]){
           data_xts_clone[j,i] = 1
@@ -159,14 +163,14 @@ economic_momentum <- function(data, n_ema = 12, from = "2007-03-01"){
       }
     }
   }
-  
+
   data_xts_clone$percent <- rowSums(data_xts_clone, na.rm = TRUE)/ncol(data_xts_clone)
   #data_xts_clone$percent[nrow(data_xts_clone)] <- rowSums(data_xts_clone[nrow(data_xts_clone),1:(ncol(data_xts_clone)-1)], na.rm = TRUE)/sum(colSums(is.na(data_xts_clone)) > 0)
   data_xts_clone$percent <- data_xts_clone$percent*100
   data_xts_clone <- data_xts_clone[13:nrow(data_xts_clone),]
   data_xts_clone$Date <- as.Date(row.names(data_xts_clone))
   data_xts_clone$ma <- EMA(data_xts_clone[,"percent"], n=n_ema)
-  
+
   c <- ggplot(data_xts_clone, aes(x=Date, y=percent))+
     geom_line()+
     geom_point()+
@@ -180,21 +184,21 @@ economic_momentum <- function(data, n_ema = 12, from = "2007-03-01"){
     ylab("")+
     xlab("")+
     theme_bw()+
-    ggtitle(paste("Percentage of Data Accelerating as of", Sys.Date(), "for", month(data_xts_clone$Date[nrow(data_xts_clone)], label = TRUE, abbr = FALSE)))+ 
-    #ggtitle(paste("Percentage of Data Accelerating as of", Sys.Date(), paste0("(",data_xts_clone$Date[nrow(data_xts_clone)],")")))+ 
+    ggtitle(paste("Percentage of Data Accelerating as of", Sys.Date(), "for", month(data_xts_clone$Date[nrow(data_xts_clone)], label = TRUE, abbr = FALSE)))+
+    #ggtitle(paste("Percentage of Data Accelerating as of", Sys.Date(), paste0("(",data_xts_clone$Date[nrow(data_xts_clone)],")")))+
     scale_x_date(date_breaks = "1 year", date_labels = "%Y")+
-    theme(axis.line = element_line(), 
-          axis.text=element_text(color='black'), 
-          axis.title = element_text(colour = 'black'), 
-          legend.text=element_text(), 
+    theme(axis.line = element_line(),
+          axis.text=element_text(color='black'),
+          axis.title = element_text(colour = 'black'),
+          legend.text=element_text(),
           legend.title=element_text(),
           axis.text.x = element_text(angle = 0),
           legend.position='none',
           text = element_text(size=10))
-  
+
   grid.arrange(c, heights = c(2.5/4, 1.5/4), ncol = 1, arrangeGrob(a, b, ncol = 2))
   tmp <- data.frame(apply(data_xts, 2, function(x) length(which(!is.na(x)))))
-  
+
   print(paste("Latest observation uses", sum(tmp[,1] == nrow(data_xts))-3, "of the possible", ncol(data_xts)-3,"time series"))
 }
 
@@ -202,7 +206,7 @@ data_load_fed_monthly <- function(){
   getSymbols(c("PCEC96", # real PCE
                "DSPIC96", # real disposable income
                "CUUR0000SEHA", #rent inflation
-               "CES0500000003", 
+               "CES0500000003",
                "PAYEMS", #nonfarm payroll
                "AWHAETP",
                "PI", #personal income
@@ -228,7 +232,7 @@ data_load_fed_monthly <- function(){
                "ALTSALES", #light vehicles
                "WPSFD41312",
                "NEWORDER",
-               "CFNAIMA3", 
+               "CFNAIMA3",
                "FRBLMCI",
                "PCEPILFE",
                "TOTALSA", #vehicle sales not delt
@@ -239,12 +243,12 @@ data_load_fed_monthly <- function(){
                "PPIACO", #PPI all comm delt
                "WPSFD4131", # PPI finnished core
                "AAA",
-               "BAA"), 
+               "BAA"),
                src = "FRED", from = "2000-01-01")
-  fed_ts <- merge(PCEC96, 
-        DSPIC96, 
+  fed_ts <- merge(PCEC96,
+        DSPIC96,
         CUUR0000SEHA, #rent inflation
-        CES0500000003, 
+        CES0500000003,
         PAYEMS, #nonfarm payroll
         AWHAETP,
         PI, #personal income
@@ -269,7 +273,7 @@ data_load_fed_monthly <- function(){
         AHETPI, #wages
         ALTSALES, #light vehicles
         NEWORDER/WPSFD41312,
-        CFNAIMA3, 
+        CFNAIMA3,
         FRBLMCI,
         PCEPILFE,
         TOTALSA, #vehicle sales not delt
@@ -281,7 +285,7 @@ data_load_fed_monthly <- function(){
         WPSFD4131, # PPI finnished core
         AAA,
         BAA)
-  
+
   return(fed_ts)
 }
 
@@ -298,7 +302,7 @@ data_load_fed_weekly <- function(){
                "COMPAPER",
                 "BAMLHE00EHYIEY",
                "DGS10"), src = "FRED", from = "2000-01-01")
-  
+
   NFCI <- to.monthly(NFCI, OHLC = FALSE)
   ANFCI <- to.monthly(ANFCI, OHLC = FALSE)
   KCFSI <- to.monthly(KCFSI, OHLC = FALSE)
@@ -313,7 +317,7 @@ data_load_fed_weekly <- function(){
   DGS10 <- to.monthly(DGS10, OHLC = FALSE)
   EUROJUNK <- BAMLHE00EHYIEY/DGS10
   names(EUROJUNK) <- "EUROJUNK"
-  
+
   fed_ts_data <- merge(NFCI, #chicago financial stress to monthly
         ANFCI, #chicago conditions to monthly
         KCFSI, #kansas
@@ -325,7 +329,7 @@ data_load_fed_weekly <- function(){
         TOTCI,
         COMPAPER,
         EUROJUNK)
-   
+
   return(fed_ts_data)
 }
 
@@ -334,13 +338,13 @@ data_load_quandl <- function(){
   ism.comp_emp <- Quandl("ISM/MAN_EMPL", collapse = "monthly", trim_start = "2000-01-01", type = "xts")
   ism.comp <- ism.comp[,1]
   ism.comp_emp <- ism.comp_emp[,"Index"]
-  
+
   USCOIN <- Quandl("ECRI/USCOIN", collapse = "monthly", trim_start = "2000-01-01", type = "xts")
   ECRI <- Quandl("ECRI/USLEADING", collapse = "monthly", trim_start = "2000-01-01", type = "xts")
   USCOIN <- USCOIN[,"Growth"]
   ECRI <- ECRI[,"Growth"]
   ECRI <- to.monthly(ECRI, OHLC = FALSE)
-  
+
   SPCOMP <- Quandl("YALE/SPCOMP", trim_start = "2000-01-01", type = "xts")
   SP <- Delt(SPCOMP[,"Real Price"], k=(12*5))
   SP_1 <- Delt(SPCOMP[,"Real Price"], k=(12*2))
@@ -359,37 +363,37 @@ data_load_yahoo <- function(){
   return(data_yahoo)
 }
 
-data_prep <- function(data_fed_monthly, data_fed_weekly, data_quandl, data_yahoo, from = "2007-03-01"){  
-  
+data_prep <- function(data_fed_monthly, data_fed_weekly, data_quandl, data_yahoo, from = "2007-03-01"){
+
   data_xts <- merge(data_fed_monthly, data_fed_weekly, data_quandl, data_yahoo)
   data_xts <- data_xts[1:(nrow(data_xts)-1),]
-  
+
   a <- apply(data_xts[index(data_xts) >= from,], 2, function(col) sum(is.na(col)))
   a <- data.frame(a)
   a$name <- row.names(a)
   b <- a[a$a <= 1,"name"]
-  
+
   data_xts <- data_xts[, names(data_xts) %in% b]
-                    
+
   rem <- ncol(data_xts)
-  
+
   data_xts$Agg_delt <- Delt(data_xts$CES0500000003*data_xts$PAYEMS*data_xts$AWHAETP, k = 12)
   data_xts$Agg_rent_delt <- data_xts$Agg_delt-Delt(data_xts$CUUR0000SEHA, k=12)
-  
+
   data_xts$BAA_AAA_delt <- (data_xts$BAA-data_xts$AAA)*-1
-  
+
   data_xts$NFCI_delt <- data_xts[,"NFCI"]*-1
   data_xts$ANFCI_delt <- data_xts[,"ANFCI"]*-1
   data_xts$KCFSI_delt <- data_xts[,"KCFSI"]*-1
   data_xts$STLFSI_delt <- data_xts[,"STLFSI"]*-1
   data_xts$TEDRATE_delt <- data_xts[,"TEDRATE"]*-1
   data_xts$EUROJUNK_delt  <- data_xts[,"EUROJUNK"]*-1
-  
+
   data_xts$SVGCBNS_delt <- Delt(data_xts$SVGCBNS, k = 12)*-1
   data_xts$BAMLH0A0HYM2_delt <- Delt(data_xts$BAMLH0A0HYM2, k = 12)*-1
   data_xts$UNRATE_delt <- Delt(data_xts$UNRATE, k = 12)*-1
   data_xts$CCSA_delt <- Delt(data_xts$CCSA, k = 12)*-1
-  
+
   data_xts$ism.comp_delt <- data_xts$ism.comp
   data_xts$ism.comp_emp_delt <- data_xts$ism.comp_emp
   data_xts$CFNAIMA3_delt <- data_xts$CFNAIMA3
@@ -400,7 +404,7 @@ data_prep <- function(data_fed_monthly, data_fed_weekly, data_quandl, data_yahoo
   data_xts$SP_1_delt <- data_xts$SP_1
   data_xts$TCU_delt <- data_xts$TCU
   data_xts$VIX_delt <- data_xts$VIX
-  
+
   data_xts$PPIACO_delt <- Delt(data_xts$PPIACO, k = 12) #PPI all comm delt
   data_xts$WPSFD4131_delt <- Delt(data_xts$WPSFD4131, k = 12) # PPI finnished core
   #data_xts$TTLCONS_delt <- Delt(data_xts$TTLCONS, k = 12) #Total Construction Spending delt
@@ -427,37 +431,37 @@ data_prep <- function(data_fed_monthly, data_fed_weekly, data_quandl, data_yahoo
   data_xts$COMPAPER_delt <- Delt(data_xts$COMPAPER, k = 12)
   data_xts$AHETPI_delt_inf <- data_xts$AHETPI_delt-Delt(data_xts$CUUR0000SEHA, k=12)
   data_xts$h_delt_inf <- data_xts$h_delt-Delt(data_xts$CUUR0000SEHA, k=12)
-  
-  
+
+
   return(data_xts)
 }
 
-data_prep_2 <- function(data_fed_monthly, data_fed_weekly, data_quandl, data_yahoo, from = "2007-03-01"){  
-  
+data_prep_2 <- function(data_fed_monthly, data_fed_weekly, data_quandl, data_yahoo, from = "2007-03-01"){
+
   data_xts <- merge(data_fed_monthly, data_fed_weekly, data_quandl, data_yahoo)
   data_xts <- data_xts[, names(data_xts) %in% c("NFCI","ANFCI","STLFSI","TEDRATE","BAMLH0A0HYM2","BAMLHYH0A0HYM2TRIV","CCSA","TOTCI","COMPAPER","EUROJUNK","ismp.comp","ism.comp_emp","ECRI","SP","SP_1","VIX.Adjusted")]
-  
+
   data_xts <- data_xts[1:(nrow(data_xts)-1),]
-  
+
   a <- apply(data_xts[index(data_xts) >= from,], 2, function(col) sum(is.na(col)))
   a <- data.frame(a)
   a$name <- row.names(a)
   b <- a[a$a <= 1,"name"]
-  
+
   data_xts <- data_xts[, names(data_xts) %in% b]
-  
+
   data_xts$NFCI_delt <- data_xts[,"NFCI"]*-1
   data_xts$ANFCI_delt <- data_xts[,"ANFCI"]*-1
   data_xts$KCFSI_delt <- data_xts[,"KCFSI"]*-1
   data_xts$STLFSI_delt <- data_xts[,"STLFSI"]*-1
   data_xts$TEDRATE_delt <- data_xts[,"TEDRATE"]*-1
   data_xts$EUROJUNK_delt  <- data_xts[,"EUROJUNK"]*-1
-  
-  
+
+
   data_xts$BAMLH0A0HYM2_delt <- Delt(data_xts$BAMLH0A0HYM2, k = 12)*-1
-  
+
   data_xts$CCSA_delt <- Delt(data_xts$CCSA, k = 12)*-1
-  
+
   data_xts$ism.comp_delt <- data_xts$ism.comp
   data_xts$ism.comp_emp_delt <- data_xts$ism.comp_emp
   data_xts$CFNAIMA3_delt <- data_xts$CFNAIMA3
@@ -468,12 +472,12 @@ data_prep_2 <- function(data_fed_monthly, data_fed_weekly, data_quandl, data_yah
   data_xts$SP_1_delt <- data_xts$SP_1
   data_xts$TCU_delt <- data_xts$TCU
   data_xts$VIX_delt <- data_xts$VIX
-  
+
   data_xts$BAMLHYH0A0HYM2TRIV_delt <- Delt(data_xts$BAMLHYH0A0HYM2TRIV, k = 12)
 
   data_xts$TOTCI_delt <- Delt(data_xts$TOTCI, k = 12)
   data_xts$COMPAPER_delt <- Delt(data_xts$COMPAPER, k = 12)
-  
+
   return(data_xts)
 }
 #Check periods of data loaded at end of month
@@ -501,10 +505,10 @@ economic_momentum(data_xts_2, n_ema = 6, from = "2007-03-01")
 
 
 #Update by end of month:
-#  "NFCI"               "ANFCI"              "STLFSI"             "TEDRATE"            "BAMLH0A0HYM2"      
-#[6] "BAMLHYH0A0HYM2TRIV" "CCSA"               "TOTCI"              "COMPAPER"           "EUROJUNK"          
-#[11] "ismp.comp"          "ism.comp_emp"       "ECRI"               "SP"                 "SP_1"              
-#[16] "VIX.Adjusted"    
+#  "NFCI"               "ANFCI"              "STLFSI"             "TEDRATE"            "BAMLH0A0HYM2"
+#[6] "BAMLHYH0A0HYM2TRIV" "CCSA"               "TOTCI"              "COMPAPER"           "EUROJUNK"
+#[11] "ismp.comp"          "ism.comp_emp"       "ECRI"               "SP"                 "SP_1"
+#[16] "VIX.Adjusted"
 
 
 #------
@@ -554,7 +558,7 @@ economic_momentum(data_xts_2, n_ema = 6, from = "2007-03-01")
 #corp and household balancesheet:
 #TABSNNCB
 #TNWMVBSNNCB
-#TNWBSHNO 
+#TNWBSHNO
 #TFAABSHNO
 
 #yield spreds

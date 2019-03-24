@@ -1,10 +1,10 @@
-library(quantmod)   
+library(quantmod)
 library(lubridate)
 library(ggplot2)
 library(gridExtra)
 Sys.setlocale("LC_TIME", "C")
 
-symbols <- c("SPY", "XLY", "XLP", "XLE","XLF", "XLV",   
+symbols <- c("SPY", "XLY", "XLP", "XLE","XLF", "XLV",
              "XLI", "XLB", "XLK", "XLU", "IYZ", "XSD", "IYT")
 sectors <- getSymbols(symbols, from="2015-01-01")
 
@@ -31,7 +31,7 @@ XLE.ROC <- 100*Delt(SectorModel$XLE, k = 20)
 XLP.ROC <- 100*Delt(SectorModel$XLP, k = 20)
 XLY.ROC <- 100*Delt(SectorModel$XLY, k = 20)
 
-Sec.ROC <- data.frame(XLF = XLF.ROC, XLU = XLU.ROC, XLE = XLE.ROC, XLP = XLP.ROC, XLY = XLY.ROC, 
+Sec.ROC <- data.frame(XLF = XLF.ROC, XLU = XLU.ROC, XLE = XLE.ROC, XLP = XLP.ROC, XLY = XLY.ROC,
                       Date = row.names(SectorModel))
 
 Sec.ROC <- na.omit(Sec.ROC)
@@ -56,10 +56,10 @@ sec.plot <- ggplot(Sec.ROC[Sec.ROC$Date >= "2017-01-01",], aes(x=Date, y=Model, 
   #geom_hline(yintercept = 2*sd(Sec.ROC$Model[Sec.ROC$Date >= "2017-01-01"]), linetype = "dashed", col = "blue")+
   #geom_hline(yintercept = -2*sd(Sec.ROC$Model[Sec.ROC$Date >= "2017-01-01"]), linetype = "dashed", col = "red")+
   scale_x_date(date_breaks = "1 month", date_labels = "%b")+
-  theme(axis.line = element_line(), 
-        axis.text=element_text(color='black'), 
-        axis.title = element_text(colour = 'black'), 
-        legend.text=element_text(), 
+  theme(axis.line = element_line(),
+        axis.text=element_text(color='black'),
+        axis.title = element_text(colour = 'black'),
+        legend.text=element_text(),
         legend.title=element_text(),
         axis.text.x = element_text(angle = 0),
         legend.position='none',
@@ -73,10 +73,10 @@ spy.plot <- ggplot(Sec.ROC[Sec.ROC$Date >= "2017-01-03",], aes(x=Date, y=SPY, gr
   ggtitle(paste("SPY", Sec.ROC$Date[nrow(Sec.ROC)]))+
   theme_bw()+
   scale_x_date(date_breaks = "1 month", date_labels = "%b")+
-  theme(axis.line = element_line(), 
-        axis.text=element_text(color='black'), 
-        axis.title = element_text(colour = 'black'), 
-        legend.text=element_text(), 
+  theme(axis.line = element_line(),
+        axis.text=element_text(color='black'),
+        axis.title = element_text(colour = 'black'),
+        legend.text=element_text(),
         legend.title=element_text(),
         axis.text.x = element_text(angle = 0),
         legend.position='none',
@@ -124,10 +124,10 @@ ggplot(plot_data, aes(y=scale(plot_data$cyclicals/plot_data$defensives), x = Dat
   theme_bw()+
   ggtitle(paste("Cyclicals/Defensives Performance", plot_data$Date[nrow(plot_data)]))+
   scale_x_date(date_breaks = "3 month", date_labels = "%Y %b")+
-  theme(axis.line = element_line(), 
-        axis.text=element_text(color='black'), 
-        axis.title = element_text(colour = 'black'), 
-        legend.text=element_text(), 
+  theme(axis.line = element_line(),
+        axis.text=element_text(color='black'),
+        axis.title = element_text(colour = 'black'),
+        legend.text=element_text(),
         legend.title=element_text(),
         axis.text.x = element_text(angle = 0),
         legend.position='none',
@@ -136,5 +136,5 @@ ggplot(plot_data, aes(y=scale(plot_data$cyclicals/plot_data$defensives), x = Dat
 #This correlates with profit expectations of fund managers
 
 #these look like the dollar and spread between us and jpy, ger
-#AND market implied rate hikes! 
+#AND market implied rate hikes!
 #regressions
