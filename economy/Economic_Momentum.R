@@ -8,6 +8,7 @@ library(gridExtra)
 library(Quandl)
 library(yaml)
 
+# Read key from yaml file
 keys <- read_yaml("C:/Users/janne/Documents/trading-analytics/API_keys.yaml")
 
 Sys.setlocale("LC_TIME", "C")
