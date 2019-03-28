@@ -5,8 +5,8 @@ library(reshape)
 library(lubridate)
 library(gridExtra)
 library(Quandl)
+
 Sys.setlocale("LC_TIME", "C")
-Quandl.api_key("Ykn-RwEHL2VBzptNdD6x")
 
 bear_market_risk <- function(data, from = "1976-06-01"){
   df <- data[index(data) >= from]
